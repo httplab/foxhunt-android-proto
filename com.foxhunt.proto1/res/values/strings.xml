@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FoxhuntProto</string>
+    <string name="title">Foxhunt Prototype</string>
+    <string name="waiting">Waiting for position</string>
+    <string name="pos_ready">Position is available</string>
+    <string name="fix_url">http://httplab.ru</string>
+</resources>
