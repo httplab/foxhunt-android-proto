@@ -4,5 +4,5 @@
     <string name="title">Foxhunt Prototype</string>
     <string name="waiting">Waiting for position</string>
     <string name="pos_ready">Position is available</string>
-    <string name="fix_url">http://httplab.ru</string>
+    <string name="fix_url">http://dev.httplab.ru:4567/fix</string>
 </resources>

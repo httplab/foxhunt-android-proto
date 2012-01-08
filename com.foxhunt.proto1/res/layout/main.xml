@@ -32,18 +32,9 @@
             android:layout_weight="1.0"
             >
         <ScrollView android:id="@+id/scvObjects" android:layout_width="fill_parent" android:minHeight="100px" android:fillViewport="true">
-            <LinearLayout android:layout_height="fill_parent" android:layout_width="wrap_content" android:orientation="vertical">
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-                <TextView android:text="A Fox: 34.3456; 43.4322 : 400m" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="20sp" android:drawableLeft="@drawable/fox_red32"/>
-            </LinearLayout>
+            <LinearLayout android:layout_height="fill_parent" android:layout_width="wrap_content" android:orientation="vertical" android:id="@+id/llFoxes" />
+               
+
         </ScrollView>
     </TableRow>
     <TableRow

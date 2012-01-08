@@ -4,17 +4,25 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.AsyncTask;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
+import android.telephony.TelephonyManager;
+import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +34,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class FixSender {
+	private String _fixUrl;
+	private  TelephonyManager _telephonyManager;
+
     public interface FixResponseListener{
-        void OnFixResponse(Fox[] foxes);
+        void OnFixResponse(ArrayList<Fox> foxes);
     }
 
     private ArrayList<FixResponseListener> _responseListeners = new ArrayList<FixResponseListener>();
@@ -40,14 +51,15 @@ public class FixSender {
         this._fixUrl = _fixUrl;
     }
 
-    private String _fixUrl;
+
 
     public void AddFixResponseListener(FixResponseListener fixResponseListener){
         _responseListeners.add(fixResponseListener);
     }
 
-    public  FixSender(String fixUrl){
+    public  FixSender(String fixUrl, TelephonyManager telephonyManager){
         this._fixUrl = fixUrl;
+	    this._telephonyManager = telephonyManager;
     }
     
     public void SendFix(Location location)
@@ -55,7 +67,7 @@ public class FixSender {
         new SendFixTask(this).execute(location);
     }
 
-    private class SendFixTask extends AsyncTask<Location, Integer, Fox[]>{
+    private class SendFixTask extends AsyncTask<Location, Integer, ArrayList<Fox>>{
         FixSender _owner;
 
         public SendFixTask(FixSender owner)
@@ -64,32 +76,112 @@ public class FixSender {
         }
 
         @Override
-        protected Fox[] doInBackground(Location... locations) {
+        protected ArrayList<Fox> doInBackground(Location... locations) {
             HttpClient client = new DefaultHttpClient();
+	        HttpGet httpGet = new HttpGet(_fixUrl);
             HttpPost httpPost = new HttpPost(_fixUrl);
-
+	        HttpResponse response = null;
 	        try {
 		        // Add your data
-		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		        nameValuePairs.add(new BasicNameValuePair("lat", String.format("%f",locations[0].getLatitude())));
 		        nameValuePairs.add(new BasicNameValuePair("lon", String.format("%f",locations[0].getLongitude())));
-		        nameValuePairs.add(new BasicNameValuePair("alt", String.format("%f",locations[0].getAltitude())));
+
+		        if(locations[0].hasAltitude())
+		            nameValuePairs.add(new BasicNameValuePair("alt", String.format("%f",locations[0].getAltitude())));
+
+		        if(locations[0].hasAccuracy())
+		            nameValuePairs.add(new BasicNameValuePair("acc", String.format("%f",locations[0].getAccuracy())));
+
+		        nameValuePairs.add(new BasicNameValuePair("client_time", String.format("%tT",locations[0].getTime())));
+
+		        if(locations[0].hasSpeed())
+		            nameValuePairs.add(new BasicNameValuePair("speed", String.format("%f",locations[0].getSpeed())));
+
+		        if(locations[0].hasBearing())
+		            nameValuePairs.add(new BasicNameValuePair("bearing", String.format("%f",locations[0].getBearing())));
+
+		        nameValuePairs.add(new BasicNameValuePair("provider_id", locations[0].getProvider() == "gps" ? "1" : "2"));
+
+		        nameValuePairs.add(new BasicNameValuePair("device_id",_telephonyManager.getDeviceId()));
+		        //nameValuePairs.add(new BasicNameValuePair("device_id","1"));
+		        nameValuePairs.add(new BasicNameValuePair("sim_id",_telephonyManager.getSimSerialNumber()));
+		        nameValuePairs.add(new BasicNameValuePair("line_number",_telephonyManager.getLine1Number()));
+		        nameValuePairs.add(new BasicNameValuePair("sim_operator_name",_telephonyManager.getSimOperatorName()));
+		        nameValuePairs.add(new BasicNameValuePair("user_id",String.format("%d",1)));
+
 		        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 		        // Execute HTTP Post Request
-		        HttpResponse response = client.execute(httpPost);
+		        response = client.execute(httpPost);
+
 
 	        } catch (ClientProtocolException e) {
 		        // TODO Auto-generated catch block
 	        } catch (IOException e) {
-		        // TODO Auto-generated catch block
+		        String z = e.getMessage();
+
 	        }
 	        
-	        return new Fox[0];
+	        if(response!=null)
+	        {
+		        try
+		        {
+		            String s = HttpHelper._getResponseBody(response.getEntity());
+			        return ParseFoxes(s);
+		        }
+		        catch (ParseException ex)
+		        {
+		            return null;
+		        }
+		        catch (IOException ex)
+		        {
+		            return  null;
+		        }
+		        
+
+		      
+
+	        }
+	        else
+	        {
+		        return null;
+	        }
         }
 
+
+
+
+	    private ArrayList<Fox> ParseFoxes(String s)
+	    {
+		    try
+		    {
+			    
+		        JSONArray obj = new JSONArray(s);
+			    int len = obj.length();
+			    ArrayList<Fox> res = new ArrayList<Fox>();
+			    for(int i=0; i<len; i++)
+			    {
+					JSONObject foxStr = obj.getJSONObject(i).getJSONObject("fox");
+					Fox fox = new Fox();
+				    fox.setId(foxStr.getInt("id"));
+				    fox.setName(foxStr.getString("name"));
+				    fox.setLat(foxStr.getDouble("lat"));
+				    fox.setLon(foxStr.getDouble("lon"));
+				    res.add(fox);
+			    }
+			    
+			    return res;
+		    }
+		    catch (JSONException ex)
+		    {
+			        return  null;
+		    }
+
+	    }
+
         @Override
-        protected void onPostExecute(Fox[] foxes) {
+        protected void onPostExecute(ArrayList<Fox> foxes) {
             super.onPostExecute(foxes);    //To change body of overridden methods use File | Settings | File Templates.
             for(FixResponseListener  rl :  _owner._responseListeners)
             {

@@ -32,10 +32,11 @@ public final class R {
         public static final int fox_red64=0x7f020012;
     }
     public static final class id {
+        public static final int llFoxes=0x7f050003;
         public static final int scvObjects=0x7f050002;
         public static final int tblMain=0x7f050000;
         public static final int txtCoords=0x7f050001;
-        public static final int txtStatus=0x7f050003;
+        public static final int txtStatus=0x7f050004;
     }
     public static final class layout {
         public static final int main=0x7f030000;
