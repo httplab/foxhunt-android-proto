@@ -1,4 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+        
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        >
+    <TextView
+            android:id="@+id/txtCoords"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text=""
+            android:textSize="16sp"
+            android:background="#002200"
+            android:layout_weight="0"
+            android:minHeight="16sp"
+     />
+
+    <!--<View android:layout_height="wrap_content" android:layout_width="fill_parent" android:background="#222200" android:layout_weight="1"/>-->
+    <com.foxhunt.proto1.FoxhuntMap android:layout_height="fill_parent" android:layout_weight="1" android:layout_width="fill_parent" android:background="#0000ee" android:id="@+id/fxmMap"/>
+    <ScrollView android:id="@+id/scvObjects" android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="#220000" android:layout_weight="1">
+        <LinearLayout android:layout_height="fill_parent" android:layout_width="fill_parent" android:orientation="vertical" android:id="@+id/llFoxes" />
+    </ScrollView>
+    <TextView
+            android:id="@+id/txtStatus"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:text=""
+            android:textSize="16sp"
+            android:background="#000022"
+            android:minHeight="16sp"
+    />
+
+</LinearLayout>
+
+<!--
 <TableLayout
         android:id="@+id/tblMain"
         android:layout_width="fill_parent"
@@ -17,14 +53,7 @@
             android:minHeight="100px"
             android:padding="5px"
             >
-        <!--com.google.android.maps.MapView
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/mapview"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:clickable="true"
-                android:apiKey="0E0mZ3wTjLglthEYrJ2i_AuL5IWJ2j7HBL4-FCQ"
-                /-->
+
     </TableRow>
     <TableRow
             android:background="#220000"
@@ -44,4 +73,4 @@
         <TextView android:id="@+id/txtStatus" android:text=""/>
     </TableRow>
 
-</TableLayout>
+</TableLayout>       -->
