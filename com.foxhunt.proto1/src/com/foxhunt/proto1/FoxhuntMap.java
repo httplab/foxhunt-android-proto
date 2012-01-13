@@ -1,17 +1,13 @@
 package com.foxhunt.proto1;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.AttributeSet;
 import android.view.View;
-import org.apache.http.NameValuePair;
 
 import java.util.ArrayList;
 
@@ -24,13 +20,14 @@ import java.util.ArrayList;
  */
 public class FoxhuntMap extends View
 {
-	private int _width;
-	private int _height;
+	private int width;
+	private int height;
 	
-	private Location _center;
-	private double _scale=20.0;
-	private ArrayList<Fox> _foxes;	
-	
+	private Location center;
+	private double scale =1000.0;
+	private ArrayList<Fox> foxes;
+	final Projection projection = new MercatorProjection(center,scale);
+
 	public FoxhuntMap(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context,  attrs, defStyle);
@@ -47,19 +44,21 @@ public class FoxhuntMap extends View
 
 	public void setCenter(Location center)
 	{
-		_center = center;
+		projection.setCenter(center);
+		this.center = center;
 		invalidate();
 	}
 
 	public void setScale(double scale)
 	{
-		_scale = scale;
+		this.scale = scale;
+		projection.setScale(scale);
 		invalidate();
 	}
 
 	public void setFoxes(ArrayList<Fox> foxes)
 	{
-		_foxes = foxes;
+		this.foxes = foxes;
 		invalidate();
 	}
 
@@ -68,13 +67,13 @@ public class FoxhuntMap extends View
 		super.onDraw(canvas);    //To change body of overridden methods use File | com.foxhunt.proto1.Settings | File Templates.
 		Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
 		p.setARGB(255,230,230,230);
-		canvas.drawCircle(_width / 2, _height / 2, 3, p);
+		canvas.drawCircle(width / 2, height / 2, 3, p);
 		
 		Bitmap icon = BitmapFactory.decodeResource(this.getResources(),R.drawable.fox_red16);
 		
-		if(_foxes!=null)
+		if(foxes !=null)
 		{
-			for(Fox fox : _foxes)
+			for(Fox fox : foxes)
 			{
 				DrawFox(fox,canvas,icon,p);
 			}
@@ -83,14 +82,8 @@ public class FoxhuntMap extends View
 	
 	private void DrawFox(Fox f, Canvas canvas, Bitmap icon, Paint p)
 	{
-		Location sameLat = new Location(f.getLocation());
-		sameLat.setLatitude(_center.getLatitude());
-
-		Location sameLon = new Location(f.getLocation());
-		sameLon.setLongitude(_center.getLongitude());
-
-		double x = sameLat.distanceTo(_center)/_scale + _width/2;
-		double y = -sameLon.distanceTo(_center)/_scale + _height/2;
+		double x = projection.getXCoord(f.getLocation()) +width/2;
+		double y = projection.getYCoord(f.getLocation()) + height/2;
 		canvas.drawBitmap(icon,(float)x,(float)y,p);
 		canvas.drawText(f.getName(),(float)x+10,(float) y+5,p);
 	}
@@ -98,8 +91,8 @@ public class FoxhuntMap extends View
 	@Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 	{
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		_width = View.MeasureSpec.getSize(widthMeasureSpec);
-		_height = View.MeasureSpec.getSize(heightMeasureSpec);
-		setMeasuredDimension(_width, _height);
+		width = View.MeasureSpec.getSize(widthMeasureSpec);
+		height = View.MeasureSpec.getSize(heightMeasureSpec);
+		setMeasuredDimension(width, height);
 	}
 }
