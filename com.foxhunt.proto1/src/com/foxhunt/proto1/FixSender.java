@@ -1,5 +1,6 @@
 package com.foxhunt.proto1;
 
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
@@ -30,6 +31,7 @@ import java.util.List;
 public class FixSender {
 	private String _fixUrl;
 	private  TelephonyManager _telephonyManager;
+	private int userId;
 
     public interface FixResponseListener{
         void OnFixResponse(ArrayList<Fox> foxes);
@@ -51,9 +53,10 @@ public class FixSender {
         _responseListeners.add(fixResponseListener);
     }
 
-    public  FixSender(String fixUrl, TelephonyManager telephonyManager){
+    public  FixSender(String fixUrl, TelephonyManager telephonyManager, int userId){
         this._fixUrl = fixUrl;
 	    this._telephonyManager = telephonyManager;
+	    this.userId = userId;
     }
     
     public void SendFix(Location location)
@@ -102,7 +105,7 @@ public class FixSender {
 		        nameValuePairs.add(new BasicNameValuePair("sim_id",_telephonyManager.getSimSerialNumber()));
 		        nameValuePairs.add(new BasicNameValuePair("line_number",_telephonyManager.getLine1Number()));
 		        nameValuePairs.add(new BasicNameValuePair("sim_operator_name",_telephonyManager.getSimOperatorName()));
-		        nameValuePairs.add(new BasicNameValuePair("user_id",String.format("%d",1)));
+		        nameValuePairs.add(new BasicNameValuePair("user_id",Integer.toString(userId)));
 
 		        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
@@ -132,10 +135,6 @@ public class FixSender {
 		        {
 		            return  null;
 		        }
-		        
-
-		      
-
 	        }
 	        else
 	        {

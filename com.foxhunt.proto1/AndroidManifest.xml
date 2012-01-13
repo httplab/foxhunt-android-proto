@@ -22,6 +22,7 @@
         </activity>
         <activity android:name=".Settings"/>
         <activity android:name=".TcpClientActivity"/>
+        <activity android:name=".LoginInfoActivity"/>
     </application>
 
     <supports-screens android:resizeable="false"

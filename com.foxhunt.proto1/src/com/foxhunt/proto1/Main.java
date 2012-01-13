@@ -50,19 +50,26 @@ public class Main extends MapActivity
 
 	    String fixUrl = getSharedPreferences(PREFS_NAME,0).getString("fix_url", getResources().getString(R.string.fix_url));
 	    
-	    _fixSender = new FixSender(fixUrl,(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE));
-	    _fixSender.AddFixResponseListener(new FixSender.FixResponseListener()
+	    int userId = getSharedPreferences(PREFS_NAME,0).getInt("user_id", -1);
+	    if(userId>=0)
 	    {
-		    @Override public void OnFixResponse(ArrayList<Fox> foxes)
+		    _fixSender = new FixSender(fixUrl,(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE),userId);
+		    _fixSender.AddFixResponseListener(new FixSender.FixResponseListener()
 		    {
-			    TextView txtStatus = (TextView) findViewById(R.id.txtStatus);
-			    txtStatus.setText(String.format("%tT fix sent", new Date()));
-			    RefreshFoxes(foxes);
-		    }
-	    });
-        BeginPositionListen();
-	    
-
+			    @Override public void OnFixResponse(ArrayList<Fox> foxes)
+			    {
+				    TextView txtStatus = (TextView) findViewById(R.id.txtStatus);
+				    txtStatus.setText(String.format("%tT fix sent", new Date()));
+				    RefreshFoxes(foxes);
+			    }
+		    });
+	        BeginPositionListen();
+	    }
+	    else
+	    {
+		    Intent intent2 = new Intent(Main.this, LoginInfoActivity.class);
+		    startActivity(intent2);
+	    }
     }
 
 	protected void RefreshFoxes(ArrayList<Fox> foxes)
@@ -145,6 +152,10 @@ public class Main extends MapActivity
 			case R.id.miTcpTest:
 				Intent intent1 = new Intent(Main.this, TcpClientActivity.class);
 				startActivity(intent1);
+				return true;
+			case R.id.miLoginInfo:
+				Intent intent2 = new Intent(Main.this, LoginInfoActivity.class);
+				startActivity(intent2);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
