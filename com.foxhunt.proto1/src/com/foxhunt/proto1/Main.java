@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import java.util.*;
 
 public class Main extends MapActivity
 {
+	public static final String PREFS_NAME = "FoxhuntSettings";
+
 	private FixSender _fixSender;
 
 	public void setLastKnownLocation(Location _lastKnownLocation)
@@ -45,7 +48,9 @@ public class Main extends MapActivity
         setContentView(R.layout.main);
 	    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-	    _fixSender = new FixSender(getString(R.string.fix_url),(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE));
+	    String fixUrl = getSharedPreferences(PREFS_NAME,0).getString("fix_url", getResources().getString(R.string.fix_url));
+	    
+	    _fixSender = new FixSender(fixUrl,(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE));
 	    _fixSender.AddFixResponseListener(new FixSender.FixResponseListener()
 	    {
 		    @Override public void OnFixResponse(ArrayList<Fox> foxes)
@@ -133,7 +138,14 @@ public class Main extends MapActivity
 
 				alertDialog.show();
 				return true;
-
+			case R.id.miSettings:
+				Intent intent = new Intent(Main.this, Settings.class);
+				startActivity(intent);
+				return true;
+			case R.id.miTcpTest:
+				Intent intent1 = new Intent(Main.this, TcpClientActivity.class);
+				startActivity(intent1);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -182,11 +194,11 @@ class MyListener implements LocationListener
 
     @Override
     public void onProviderEnabled(String s) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        //To change body of implemented methods use File | com.foxhunt.proto1.Settings | File Templates.
     }
 
     @Override
     public void onProviderDisabled(String s) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        //To change body of implemented methods use File | com.foxhunt.proto1.Settings | File Templates.
     }
 }

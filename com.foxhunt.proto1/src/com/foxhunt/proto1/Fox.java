@@ -9,7 +9,7 @@ import java.util.Date;
  * User: Nu-hin
  * Date: 07.01.12
  * Time: 1:44
- * To change this template use File | Settings | File Templates.
+ * To change this template use File | com.foxhunt.proto1.Settings | File Templates.
  */
 public class Fox {
     private double _lat;

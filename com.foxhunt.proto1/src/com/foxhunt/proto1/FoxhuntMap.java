@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * User: Nu-hin
  * Date: 08.01.12
  * Time: 18:48
- * To change this template use File | Settings | File Templates.
+ * To change this template use File | com.foxhunt.proto1.Settings | File Templates.
  */
 public class FoxhuntMap extends View
 {
@@ -65,7 +65,7 @@ public class FoxhuntMap extends View
 
 	@Override protected void onDraw(Canvas canvas)
 	{
-		super.onDraw(canvas);    //To change body of overridden methods use File | Settings | File Templates.
+		super.onDraw(canvas);    //To change body of overridden methods use File | com.foxhunt.proto1.Settings | File Templates.
 		Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
 		p.setARGB(255,230,230,230);
 		canvas.drawCircle(_width / 2, _height / 2, 3, p);

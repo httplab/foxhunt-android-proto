@@ -1,7 +1,5 @@
 package com.foxhunt.proto1;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
@@ -13,15 +11,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +25,7 @@ import java.util.List;
  * User: Nu-hin
  * Date: 07.01.12
  * Time: 1:43
- * To change this template use File | Settings | File Templates.
+ * To change this template use File | com.foxhunt.proto1.Settings | File Templates.
  */
 public class FixSender {
 	private String _fixUrl;
@@ -127,7 +121,7 @@ public class FixSender {
 	        {
 		        try
 		        {
-		            String s = HttpHelper._getResponseBody(response.getEntity());
+		            String s = HttpHelper.getResponseBody(response.getEntity());
 			        return ParseFoxes(s);
 		        }
 		        catch (ParseException ex)
@@ -182,7 +176,7 @@ public class FixSender {
 
         @Override
         protected void onPostExecute(ArrayList<Fox> foxes) {
-            super.onPostExecute(foxes);    //To change body of overridden methods use File | Settings | File Templates.
+            super.onPostExecute(foxes);    //To change body of overridden methods use File | com.foxhunt.proto1.Settings | File Templates.
             for(FixResponseListener  rl :  _owner._responseListeners)
             {
                 rl.OnFixResponse(foxes);
@@ -191,17 +185,17 @@ public class FixSender {
 
         @Override
         protected void onCancelled() {
-            super.onCancelled();    //To change body of overridden methods use File | Settings | File Templates.
+            super.onCancelled();    //To change body of overridden methods use File | com.foxhunt.proto1.Settings | File Templates.
         }
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();    //To change body of overridden methods use File | Settings | File Templates.
+            super.onPreExecute();    //To change body of overridden methods use File | com.foxhunt.proto1.Settings | File Templates.
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);    //To change body of overridden methods use File | Settings | File Templates.
+            super.onProgressUpdate(values);    //To change body of overridden methods use File | com.foxhunt.proto1.Settings | File Templates.
         }
     }
 }
