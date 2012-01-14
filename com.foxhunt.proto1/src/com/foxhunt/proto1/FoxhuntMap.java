@@ -24,7 +24,7 @@ public class FoxhuntMap extends View
 	private int height;
 	
 	private Location center;
-	private double scale = 1000.0;
+	private double scale = 10.0;
 	private ArrayList<Fox> foxes;
 	final Projection projection = new MercatorProjection(center,scale);
 
