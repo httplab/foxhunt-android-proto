@@ -15,16 +15,23 @@ public class MercatorProjection extends Projection
 	{
 		double longitude = location.getLongitude();
 		double centerLongitude = center.getLongitude();
-		return (longitude-centerLongitude) * (Projection.EARTH_MEAN_RADIUS/scale);
+		double meters = (longitude-centerLongitude) * Projection.EARTH_MEAN_RADIUS;
+		return meters/scale;
 	}
 
 	@Override public double getYCoord(Location location)
 	{
 		double latitude = location.getLatitude();
 		double centerLatitude = center.getLatitude();
-		return -Math.log(1+Math.sin(latitude-centerLatitude)/Math.cos(latitude-centerLatitude)) *  (Projection.EARTH_MEAN_RADIUS/scale);
+		double meters = Math.log(1+Math.sin(latitude-centerLatitude)/Math.cos(latitude-centerLatitude)) *  Projection.EARTH_MEAN_RADIUS;
+		return -meters/scale;
 	}
-	
+
+	@Override public double getLength(double length)
+	{
+		return length/scale;
+	}
+
 	public MercatorProjection(Location center, double scale)
 	{
 		super(center, scale);

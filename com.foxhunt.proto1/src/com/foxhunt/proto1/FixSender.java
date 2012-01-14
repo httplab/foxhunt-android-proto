@@ -17,9 +17,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,26 +82,27 @@ public class FixSender {
             HttpPost httpPost = new HttpPost(_fixUrl);
 	        HttpResponse response = null;
 	        try {
-		        // Add your data
 		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-		        nameValuePairs.add(new BasicNameValuePair("lat", String.format("%f",locations[0].getLatitude())));
-		        nameValuePairs.add(new BasicNameValuePair("lon", String.format("%f",locations[0].getLongitude())));
+
+
+		        nameValuePairs.add(new BasicNameValuePair("lat", String.format(Locale.US, "%f",locations[0].getLatitude())));
+		        nameValuePairs.add(new BasicNameValuePair("lon", String.format(Locale.US, "%f",locations[0].getLongitude())));
 
 		        if(locations[0].hasAltitude())
-		            nameValuePairs.add(new BasicNameValuePair("alt", String.format("%f",locations[0].getAltitude())));
+		            nameValuePairs.add(new BasicNameValuePair("alt", String.format(Locale.US, "%f",locations[0].getAltitude())));
 
 		        if(locations[0].hasAccuracy())
-		            nameValuePairs.add(new BasicNameValuePair("acc", String.format("%f",locations[0].getAccuracy())));
+		            nameValuePairs.add(new BasicNameValuePair("acc", String.format(Locale.US, "%f",locations[0].getAccuracy())));
 
 		        nameValuePairs.add(new BasicNameValuePair("client_time", String.format("%tT",locations[0].getTime())));
 
 		        if(locations[0].hasSpeed())
-		            nameValuePairs.add(new BasicNameValuePair("speed", String.format("%f",locations[0].getSpeed())));
+		            nameValuePairs.add(new BasicNameValuePair("speed", String.format(Locale.US, "%f",locations[0].getSpeed())));
 
 		        if(locations[0].hasBearing())
-		            nameValuePairs.add(new BasicNameValuePair("bearing", String.format("%f",locations[0].getBearing())));
+		            nameValuePairs.add(new BasicNameValuePair("bearing", String.format(Locale.US, "%f",locations[0].getBearing())));
 
-		        nameValuePairs.add(new BasicNameValuePair("provider_id", locations[0].getProvider() == "gps" ? "1" : "2"));
+		        nameValuePairs.add(new BasicNameValuePair("provider_id", locations[0].getProvider().equals("gps") ? "1" : "2"));
 
 		        nameValuePairs.add(new BasicNameValuePair("device_id",_telephonyManager.getDeviceId()));
 		        //nameValuePairs.add(new BasicNameValuePair("device_id","1"));
@@ -109,7 +113,6 @@ public class FixSender {
 
 		        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-		        // Execute HTTP Post Request
 		        response = client.execute(httpPost);
 
 

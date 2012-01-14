@@ -38,6 +38,7 @@ public abstract class Projection
 
 	public abstract double getXCoord(Location location);
 	public abstract double getYCoord(Location location);
+	public abstract double getLength(double length);
 
 	public Projection(Location center, double scale)
 	{

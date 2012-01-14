@@ -24,7 +24,7 @@ public class FoxhuntMap extends View
 	private int height;
 	
 	private Location center;
-	private double scale =1000.0;
+	private double scale = 1000.0;
 	private ArrayList<Fox> foxes;
 	final Projection projection = new MercatorProjection(center,scale);
 
@@ -78,6 +78,15 @@ public class FoxhuntMap extends View
 				DrawFox(fox,canvas,icon,p);
 			}
 		}
+
+		if(center!=null)
+		{
+			Paint radius = new Paint(0);
+			radius.setARGB(20,255,127,0);
+			radius.setStyle(Paint.Style.FILL_AND_STROKE);
+			canvas.drawCircle(width/2, height/2, (float) projection.getLength(center.getAccuracy()),radius);
+		}
+		
 	}
 	
 	private void DrawFox(Fox f, Canvas canvas, Bitmap icon, Paint p)
