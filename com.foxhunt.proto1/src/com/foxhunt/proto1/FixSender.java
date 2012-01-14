@@ -21,6 +21,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +36,7 @@ public class FixSender {
 	private String _fixUrl;
 	private  TelephonyManager _telephonyManager;
 	private int userId;
+	private Date lastUpdate;
 
     public interface FixResponseListener{
         void OnFixResponse(ArrayList<Fox> foxes);
@@ -64,7 +66,20 @@ public class FixSender {
     
     public void SendFix(Location location)
     {
-        new SendFixTask(this).execute(location);
+	    long span = 1000;
+	    if(lastUpdate!=null)
+	    {
+		    long now = new Date().getTime();
+		    long then = lastUpdate.getTime();
+		    span = now-then;
+	    }
+
+	    if(span >= 1000)
+	    {
+            new SendFixTask(this).execute(location);
+	    }
+
+	    lastUpdate = new Date();
     }
 
     private class SendFixTask extends AsyncTask<Location, Integer, ArrayList<Fox>>{

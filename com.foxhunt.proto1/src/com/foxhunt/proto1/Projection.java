@@ -15,6 +15,25 @@ public abstract class Projection
 	protected Location center;
 	protected double scale;
 	public static final double EARTH_MEAN_RADIUS = 6371009;
+	public static final double EARTH_EQUATORIAL_RADIUS = 6378137;
+	public static final double EARTH_POLAR_RADIUS = 6356752.3;
+
+	public static Double RadiusAtLatitude(double latitude)
+	{
+		double radians = Math.toRadians(latitude); 
+		double cos = Math.cos(radians);
+		double sin = Math.sin(radians);
+		double num =
+				EARTH_EQUATORIAL_RADIUS * EARTH_EQUATORIAL_RADIUS * EARTH_EQUATORIAL_RADIUS * EARTH_EQUATORIAL_RADIUS *
+				cos * cos +
+				EARTH_POLAR_RADIUS * EARTH_POLAR_RADIUS * EARTH_POLAR_RADIUS * EARTH_POLAR_RADIUS *
+				sin * sin;
+		double denom =
+				EARTH_EQUATORIAL_RADIUS * EARTH_EQUATORIAL_RADIUS * cos * cos +
+				EARTH_POLAR_RADIUS * EARTH_POLAR_RADIUS * sin * sin;
+		return Math.sqrt(num/denom);
+	}
+
 
 	public Location getCenter()
 	{

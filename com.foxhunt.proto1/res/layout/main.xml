@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-        
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
         >
     <TextView
             android:id="@+id/txtCoords"
@@ -14,12 +14,41 @@
             android:background="#002200"
             android:layout_weight="0"
             android:minHeight="16sp"
-     />
+            />
 
-    <!--<View android:layout_height="wrap_content" android:layout_width="fill_parent" android:background="#222200" android:layout_weight="1"/>-->
-    <com.foxhunt.proto1.FoxhuntMap android:layout_height="fill_parent" android:layout_weight="1" android:layout_width="fill_parent" android:background="#0000ee" android:id="@+id/fxmMap"/>
-    <ScrollView android:id="@+id/scvObjects" android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="#220000" android:layout_weight="1">
-        <LinearLayout android:layout_height="fill_parent" android:layout_width="fill_parent" android:orientation="vertical" android:id="@+id/llFoxes" />
+    <com.foxhunt.proto1.FoxhuntMap
+            android:layout_height="fill_parent"
+            android:layout_weight="0.6"
+            android:layout_width="fill_parent"
+            android:background="#0000ee"
+            android:id="@+id/fxmMap"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+            android:gravity="center">
+        <Button
+                android:text="+"
+                android:minWidth="60sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="btnZoomIn_click"/>
+        <Button
+                android:text="-"
+                android:minWidth="60sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="btnZoomOut_click"/>
+        </LinearLayout>
+    <ScrollView
+            android:id="@+id/scvObjects"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#220000"
+            android:layout_weight="1">
+        <LinearLayout
+                android:layout_height="fill_parent" android:layout_width="fill_parent" android:orientation="vertical"
+                android:id="@+id/llFoxes"/>
     </ScrollView>
     <TextView
             android:id="@+id/txtStatus"
@@ -30,47 +59,6 @@
             android:textSize="16sp"
             android:background="#000022"
             android:minHeight="16sp"
-    />
+            />
 
 </LinearLayout>
-
-<!--
-<TableLayout
-        android:id="@+id/tblMain"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:stretchColumns="1,2"
-        >
-    <TableRow
-            android:background="#002200"
-            android:padding="5px"
-            >
-        <TextView android:id="@+id/txtCoords" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="" android:textSize="12px"/>
-    </TableRow>
-    <TableRow
-            android:minHeight="100px"
-            android:padding="5px"
-            >
-
-    </TableRow>
-    <TableRow
-            android:background="#220000"
-            android:padding="5px"
-            android:layout_weight="1.0"
-            >
-        <ScrollView android:id="@+id/scvObjects" android:layout_width="fill_parent" android:minHeight="100px" android:fillViewport="true">
-            <LinearLayout android:layout_height="fill_parent" android:layout_width="wrap_content" android:orientation="vertical" android:id="@+id/llFoxes" />
-               
-
-        </ScrollView>
-    </TableRow>
-    <TableRow
-            android:background="#000022"
-            android:padding="5px"
-            >
-        <TextView android:id="@+id/txtStatus" android:text=""/>
-    </TableRow>
-
-</TableLayout>       -->

@@ -5,15 +5,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.location.LocationManager;
 import android.telephony.TelephonyManager;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,8 +38,15 @@ public class Main extends MapActivity
 		return _fixSender;
 	}
 
+	@Override public void onConfigurationChanged(Configuration newConfig)
+	{
+		super.onConfigurationChanged(newConfig);
+		FoxhuntMap fxmMap= (FoxhuntMap)findViewById(R.id.fxmMap);
+		fxmMap.invalidate();
+		return;
+	}
 
-    /** Called when the activity is first created. */
+	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -72,6 +77,18 @@ public class Main extends MapActivity
 		    startActivity(intent2);
 	    }
     }
+	
+	public void btnZoomIn_click(View v)
+	{
+		FoxhuntMap fxmMap= (FoxhuntMap)findViewById(R.id.fxmMap);
+		fxmMap.setScale(fxmMap.getScale() / 1.3);
+	}
+
+	public void btnZoomOut_click(View v)
+	{
+		FoxhuntMap fxmMap= (FoxhuntMap)findViewById(R.id.fxmMap);
+		fxmMap.setScale(fxmMap.getScale() * 1.3);
+	}
 
 	protected void RefreshFoxes(ArrayList<Fox> foxes)
 	{
