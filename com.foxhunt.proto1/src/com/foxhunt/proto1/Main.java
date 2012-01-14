@@ -25,6 +25,7 @@ public class Main extends MapActivity
 {
 	public static final String PREFS_NAME = "FoxhuntSettings";
 
+
 	private FixSender _fixSender;
 
 	public void setLastKnownLocation(Location _lastKnownLocation)
@@ -157,6 +158,9 @@ public class Main extends MapActivity
 				Intent intent2 = new Intent(Main.this, LoginInfoActivity.class);
 				startActivity(intent2);
 				return true;
+			case R.id.miMyLocation:
+				FoxhuntMap map = (FoxhuntMap)findViewById(R.id.fxmMap);
+				map.setCenterOnPlayer(true);
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -194,7 +198,8 @@ class MyListener implements LocationListener
       txtCoords.setText(String.format("LAT %1f; LON %2f; ALT %3f m; TIME %4tT; ACC %5f m; SRC %6s", location.getLatitude(), location.getLongitude(), location.getAltitude(), ts,location.getAccuracy(), location.getProvider() ));
 	  _frm.getFixSender().SendFix(location);
 	  FoxhuntMap fxmMap= (FoxhuntMap)_frm.findViewById(R.id.fxmMap);
-	  fxmMap.setCenter(location);
+	  fxmMap.setPlayerPosition(location);
+
     }
 
     @Override

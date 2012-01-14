@@ -38,11 +38,17 @@ public abstract class Projection
 
 	public abstract double getXCoord(Location location);
 	public abstract double getYCoord(Location location);
+	public abstract double getLatitude(double x, double  y);
+	public abstract double getLongitude(double x, double y);
+
+
 	public abstract double getLength(double length);
 
 	public Projection(Location center, double scale)
 	{
-		this.center = center;
+		this();
+		if(center!=null)
+			this.center = center;
 		this.scale = scale;
 	}
 
@@ -51,6 +57,6 @@ public abstract class Projection
 		center = new Location(LocationManager.PASSIVE_PROVIDER);
 		center.setLatitude(0);
 		center.setLongitude(0);
-		scale = 1000;
+		scale = 20;
 	}
 }

@@ -61,8 +61,9 @@ containing a value of this type.
         public static final int miExit=0x7f06000b;
         public static final int miLoginInfo=0x7f06000c;
         public static final int miMap=0x7f06000d;
+        public static final int miMyLocation=0x7f06000f;
         public static final int miSettings=0x7f06000e;
-        public static final int miTcpTest=0x7f06000f;
+        public static final int miTcpTest=0x7f060010;
         public static final int scvObjects=0x7f060003;
         public static final int setFixUrl=0x7f060006;
         public static final int txtCoords=0x7f060001;

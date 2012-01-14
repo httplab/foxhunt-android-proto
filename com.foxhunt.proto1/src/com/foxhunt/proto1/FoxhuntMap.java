@@ -1,12 +1,11 @@
 package com.foxhunt.proto1;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import android.graphics.*;
 import android.location.Location;
+import android.location.LocationManager;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -22,8 +21,46 @@ public class FoxhuntMap extends View
 {
 	private int width;
 	private int height;
+
+	public boolean isCenterOnPlayer()
+	{
+		return centerOnPlayer;
+	}
+
+	public void setCenterOnPlayer(boolean centerOnPlayer)
+	{
+		this.centerOnPlayer = centerOnPlayer;
+		if(centerOnPlayer)
+		{
+			setCenter(playerPosition);
+		}
+	}
+
+	private boolean centerOnPlayer;
+	
+	private float touchStartX;
+	private float touchStartY;
 	
 	private Location center;
+
+	public Location getPlayerPosition()
+	{
+		return playerPosition;
+	}
+
+	public void setPlayerPosition(Location playerPosition)
+	{
+		this.playerPosition = playerPosition;
+		if(centerOnPlayer)
+		{
+			center = playerPosition;
+			projection.center = playerPosition;
+		}
+		invalidate();
+	}
+
+	private Location playerPosition;
+
 	private double scale = 10.0;
 	private ArrayList<Fox> foxes;
 	final Projection projection = new MercatorProjection(center,scale);
@@ -64,33 +101,43 @@ public class FoxhuntMap extends View
 
 	@Override protected void onDraw(Canvas canvas)
 	{
-		super.onDraw(canvas);    //To change body of overridden methods use File | com.foxhunt.proto1.Settings | File Templates.
-		Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-		p.setARGB(255,230,230,230);
-		canvas.drawCircle(width / 2, height / 2, 3, p);
-		
+		Paint backgr = new Paint();
+		backgr.setARGB(255,0,0,255);
+		backgr.setShader(new LinearGradient(0,0,width,height,Color.WHITE, Color.BLUE, Shader.TileMode.MIRROR));
+		canvas.drawPaint(backgr);
+
 		Bitmap icon = BitmapFactory.decodeResource(this.getResources(),R.drawable.fox_red16);
 		
 		if(foxes !=null)
 		{
 			for(Fox fox : foxes)
 			{
-				DrawFox(fox,canvas,icon,p);
+				DrawFox(fox,canvas,icon);
 			}
 		}
 
-		if(center!=null)
+		if(playerPosition!=null)
 		{
-			Paint radius = new Paint(0);
+			Paint p = new Paint();
+			p.setARGB(255,230,230,230);
+
+			double x = projection.getXCoord(playerPosition)+width/2;
+			double y = projection.getYCoord(playerPosition)+height/2;
+
+			canvas.drawCircle((float)x, (float)y, 3, p);
+			Paint radius = new Paint();
 			radius.setARGB(20,255,127,0);
 			radius.setStyle(Paint.Style.FILL_AND_STROKE);
-			canvas.drawCircle(width/2, height/2, (float) projection.getLength(center.getAccuracy()),radius);
+			canvas.drawCircle((float)x, (float)y, (float) projection.getLength(playerPosition.getAccuracy()),radius);
 		}
 		
 	}
 	
-	private void DrawFox(Fox f, Canvas canvas, Bitmap icon, Paint p)
+	private void DrawFox(Fox f, Canvas canvas, Bitmap icon)
 	{
+		Paint p = new Paint();
+		p.setColor(Color.WHITE);
+		
 		double x = projection.getXCoord(f.getLocation()) +width/2;
 		double y = projection.getYCoord(f.getLocation()) + height/2;
 		canvas.drawBitmap(icon,(float)x,(float)y,p);
@@ -103,5 +150,31 @@ public class FoxhuntMap extends View
 		width = View.MeasureSpec.getSize(widthMeasureSpec);
 		height = View.MeasureSpec.getSize(heightMeasureSpec);
 		setMeasuredDimension(width, height);
+	}
+
+	@Override public boolean onTouchEvent(MotionEvent event)
+	{
+		switch (event.getAction())
+		{
+			case MotionEvent.ACTION_DOWN:
+				touchStartX = event.getX();
+				touchStartY = event.getY();
+				return true;
+			case MotionEvent.ACTION_MOVE:
+				setCenterOnPlayer(false);
+				float scrolledX = event.getX() -touchStartX;
+				float scrolledY = event.getY() - touchStartY;
+				double lat = projection.getLatitude(-scrolledX/5,-scrolledY/5);
+				double lon = projection.getLongitude(-scrolledX/5,-scrolledY/5);
+
+				Location loc = new Location(LocationManager.PASSIVE_PROVIDER);
+				loc.setLatitude(lat);
+				loc.setLongitude(lon);
+
+				setCenter(loc);
+				return true;
+		}
+
+		return true;
 	}
 }
