@@ -14,39 +14,30 @@ public class MercatorProjection extends Projection
 	@Override public double getXCoord(Location location)
 	{
 		double longitude = Math.toRadians(location.getLongitude());
-		double centerLongitude = Math.toRadians(center.getLongitude());
-		double meters = (longitude-centerLongitude) * Projection.EARTH_MEAN_RADIUS;
+		double meters = longitude * Projection.EARTH_MEAN_RADIUS;
 		return meters/scale;
 	}
 
 	@Override public double getLongitude(double x, double y)
 	{
-		double centerLongitude = Math.toRadians(center.getLongitude());
-		return Math.toDegrees(x*scale/Projection.EARTH_MEAN_RADIUS + centerLongitude);
+		return Math.toDegrees(x*scale/Projection.EARTH_MEAN_RADIUS);
 	}
 
 	@Override public double getLatitude(double x, double y)
 	{
-		double centerLatitude = Math.toRadians(center.getLatitude());
-		return Math.toDegrees(Math.atan(Math.sinh(-y*scale/Projection.EARTH_MEAN_RADIUS)) + centerLatitude);
+		return Math.toDegrees(Math.atan(Math.sinh(y*scale/Projection.EARTH_MEAN_RADIUS)));
 	}
 
 	@Override public double getYCoord(Location location)
 	{
 		double latitude = Math.toRadians(location.getLatitude());
-		double centerLatitude = Math.toRadians(center.getLatitude());
-		double meters = Math.log(1+Math.sin(latitude-centerLatitude)/Math.cos(latitude-centerLatitude)) *  Projection.EARTH_MEAN_RADIUS;
-		return -meters/scale;
+		double meters = Math.log(  (1+Math.sin(latitude)) /Math.cos(latitude) ) *  Projection.EARTH_MEAN_RADIUS;
+		return meters/scale;
 	}
 
-	@Override public double getLength(double length)
+	public MercatorProjection(double scale)
 	{
-		return length/scale;
-	}
-
-	public MercatorProjection(Location center, double scale)
-	{
-		super(center, scale);
+		super(scale);
 	}
 
 	public MercatorProjection()

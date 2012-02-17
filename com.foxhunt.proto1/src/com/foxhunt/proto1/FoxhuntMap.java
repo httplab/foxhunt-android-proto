@@ -21,6 +21,9 @@ public class FoxhuntMap extends View
 {
 	private int width;
 	private int height;
+	
+	private double centerX;
+	private double centerY;
 
 	public boolean isCenterOnPlayer()
 	{
@@ -40,8 +43,6 @@ public class FoxhuntMap extends View
 	
 	private float touchStartX;
 	private float touchStartY;
-	
-	private Location center;
 
 	public Location getPlayerPosition()
 	{
@@ -53,8 +54,7 @@ public class FoxhuntMap extends View
 		this.playerPosition = playerPosition;
 		if(centerOnPlayer)
 		{
-			center = playerPosition;
-			projection.center = playerPosition;
+			setCenter(playerPosition);
 		}
 		invalidate();
 	}
@@ -63,7 +63,7 @@ public class FoxhuntMap extends View
 
 	private double scale = 10.0;
 	private ArrayList<Fox> foxes;
-	final Projection projection = new MercatorProjection(center,scale);
+	final Projection projection = new MercatorProjection(scale);
 
 	public FoxhuntMap(Context context, AttributeSet attrs, int defStyle)
 	{
@@ -80,9 +80,16 @@ public class FoxhuntMap extends View
 
 
 	public void setCenter(Location center)
-	{
-		projection.setCenter(center);
-		this.center = center;
+	{   
+		if(center==null)
+		{
+			centerX=0;
+			centerY=0;
+			invalidate();
+			return;
+		}
+		centerX = projection.getXCoord(center);
+		centerY = projection.getYCoord(center);
 		invalidate();
 	}
 
@@ -93,8 +100,11 @@ public class FoxhuntMap extends View
 
 	public void setScale(double scale)
 	{
+		double oldScale=this.scale;
 		this.scale = scale;
 		projection.setScale(scale);
+		centerX = centerX/scale*oldScale;
+		centerY = centerY/scale*oldScale;
 		invalidate();
 
 	}
@@ -129,14 +139,14 @@ public class FoxhuntMap extends View
 			Paint p = new Paint();
 			p.setARGB(255,230,230,230);
 
-			double x = projection.getXCoord(playerPosition)+width/2;
-			double y = projection.getYCoord(playerPosition)+height/2;
+			double x = projection.getXCoord(playerPosition)-centerX+width/2;
+			double y = projection.getYCoord(playerPosition)-centerY+height/2;
 
 			canvas.drawCircle((float)x, (float)y, 3, p);
 			Paint radius = new Paint();
 			radius.setARGB(20,255,127,0);
 
-			canvas.drawCircle((float)x, (float)y, (float) projection.getLength(playerPosition.getAccuracy()),radius);
+			canvas.drawCircle((float)x, (float)y, (float) (playerPosition.getAccuracy()/scale),radius);
 		}
 
 
@@ -158,8 +168,8 @@ public class FoxhuntMap extends View
 		Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
 		p.setColor(Color.WHITE);
 		
-		double x = projection.getXCoord(f.getLocation()) +width/2;
-		double y = projection.getYCoord(f.getLocation()) + height/2;
+		double x = projection.getXCoord(f.getLocation()) -centerX + width/2;
+		double y = projection.getYCoord(f.getLocation()) - centerY + height/2;
 		canvas.drawBitmap(icon,(float)x-8,(float)y-15,p);
 		canvas.drawText(f.getName(),(float)x+22-16,(float) y-5,p);
 	}
@@ -184,18 +194,14 @@ public class FoxhuntMap extends View
 				setCenterOnPlayer(false);
 				float scrolledX = event.getX() -touchStartX;
 				float scrolledY = event.getY() - touchStartY;
-				double lat = projection.getLatitude(-scrolledX/2,-scrolledY/2);
-				double lon = projection.getLongitude(-scrolledX/2,-scrolledY/2);
 
-				Location loc = new Location(LocationManager.PASSIVE_PROVIDER);
-				loc.setLatitude(lat);
-				loc.setLongitude(lon);
+				centerX -=scrolledX;
+				centerY -=scrolledY;
 
-				setCenter(loc);
 				touchStartX = event.getX();
 				touchStartY = event.getY();
 
-
+				invalidate();
 				return true;
 		}
 

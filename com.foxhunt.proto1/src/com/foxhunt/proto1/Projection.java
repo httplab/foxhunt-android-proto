@@ -12,11 +12,11 @@ import android.location.LocationManager;
  */
 public abstract class Projection
 {
-	protected Location center;
 	protected double scale;
 	public static final double EARTH_MEAN_RADIUS = 6371009;
 	public static final double EARTH_EQUATORIAL_RADIUS = 6378137;
 	public static final double EARTH_POLAR_RADIUS = 6356752.3;
+	public static final double EARTH_ECCENTRICITY = 0.0818191908426;
 
 	public static Double RadiusAtLatitude(double latitude)
 	{
@@ -34,17 +34,6 @@ public abstract class Projection
 		return Math.sqrt(num/denom);
 	}
 
-
-	public Location getCenter()
-	{
-		return center;
-	}
-
-	public void setCenter(Location center)
-	{
-		this.center = center;
-	}
-
 	public double getScale()
 	{
 		return scale;
@@ -60,22 +49,14 @@ public abstract class Projection
 	public abstract double getLatitude(double x, double  y);
 	public abstract double getLongitude(double x, double y);
 
-
-	public abstract double getLength(double length);
-
-	public Projection(Location center, double scale)
+	public Projection(double scale)
 	{
 		this();
-		if(center!=null)
-			this.center = center;
 		this.scale = scale;
 	}
 
 	public Projection()
 	{
-		center = new Location(LocationManager.PASSIVE_PROVIDER);
-		center.setLatitude(0);
-		center.setLongitude(0);
 		scale = 20;
 	}
 }
