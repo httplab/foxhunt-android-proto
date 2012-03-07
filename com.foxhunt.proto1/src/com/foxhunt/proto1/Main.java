@@ -12,14 +12,12 @@ import android.os.Bundle;
 import android.location.LocationManager;
 import android.telephony.TelephonyManager;
 import android.view.*;
-import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.google.android.maps.MapActivity;
 
 import java.util.*;
 
-public class Main extends MapActivity
+public class Main extends Activity
 {
 	public static final String PREFS_NAME = "FoxhuntSettings";
 
@@ -46,7 +44,13 @@ public class Main extends MapActivity
 		return;
 	}
 
-	/** Called when the activity is first created. */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startService(new Intent(this, FoxhuntService.class));
+    }
+
+    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -54,22 +58,22 @@ public class Main extends MapActivity
         setContentView(R.layout.main);
 	    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-	    String fixUrl = getSharedPreferences(PREFS_NAME,0).getString("fix_url", getResources().getString(R.string.fix_url));
+	    //String fixUrl = getSharedPreferences(PREFS_NAME,0).getString("fix_url", getResources().getString(R.string.fix_url));
 	    
 	    int userId = getSharedPreferences(PREFS_NAME,0).getInt("user_id", -1);
 	    if(userId>=0)
 	    {
-		    _fixSender = new FixSender(fixUrl,(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE),userId);
-		    _fixSender.AddFixResponseListener(new FixSender.FixResponseListener()
-		    {
-			    @Override public void OnFixResponse(ArrayList<Fox> foxes)
-			    {
-				    TextView txtStatus = (TextView) findViewById(R.id.txtStatus);
-				    txtStatus.setText(String.format("%tT fix sent", new Date()));
-				    RefreshFoxes(foxes);
-			    }
-		    });
-	        BeginPositionListen();
+//		    _fixSender = new FixSender(fixUrl,(TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE),userId);
+//		    _fixSender.AddFixResponseListener(new FixSender.FixResponseListener()
+//		    {
+//			    @Override public void OnFixResponse(ArrayList<Fox> foxes)
+//			    {
+//				    TextView txtStatus = (TextView) findViewById(R.id.txtStatus);
+//				    txtStatus.setText(String.format("%tT fix sent", new Date()));
+//				    RefreshFoxes(foxes);
+//			    }
+//		    });
+//	        BeginPositionListen();
 	    }
 	    else
 	    {
@@ -137,6 +141,9 @@ public class Main extends MapActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
+        FoxhuntClientApplication application = (FoxhuntClientApplication) getApplication();
+
+
 		switch (item.getItemId()) {
 			case R.id.miExit:
 				AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -147,7 +154,7 @@ public class Main extends MapActivity
 					@Override public void onClick(DialogInterface dialogInterface, int i)
 					{
 						dialogInterface.dismiss();
-
+                        stopService(new Intent(Main.this, FoxhuntService.class));
 						finish();
 
 					}
@@ -164,13 +171,10 @@ public class Main extends MapActivity
 				alertDialog.show();
 				return true;
 			case R.id.miSettings:
-				Intent intent = new Intent(Main.this, Settings.class);
+				Intent intent = new Intent(Main.this, Preferences.class);
 				startActivity(intent);
 				return true;
-			case R.id.miTcpTest:
-				Intent intent1 = new Intent(Main.this, TcpClientActivity.class);
-				startActivity(intent1);
-				return true;
+
 			case R.id.miLoginInfo:
 				Intent intent2 = new Intent(Main.this, LoginInfoActivity.class);
 				startActivity(intent2);
@@ -178,6 +182,13 @@ public class Main extends MapActivity
 			case R.id.miMyLocation:
 				FoxhuntMap map = (FoxhuntMap)findViewById(R.id.fxmMap);
 				map.setCenterOnPlayer(true);
+                return true;
+            case R.id.miGoOnline:
+                application.getFoxhuntService().goOnline();
+                return true;
+            case R.id.miGoOffline:
+                application.getFoxhuntService().goOffline();
+                return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -190,11 +201,6 @@ public class Main extends MapActivity
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new MyListener((this)));
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new MyListener((this)));
 
-    }
-
-    @Override
-    protected boolean isRouteDisplayed(){
-        return  false;
     }
 }
 
