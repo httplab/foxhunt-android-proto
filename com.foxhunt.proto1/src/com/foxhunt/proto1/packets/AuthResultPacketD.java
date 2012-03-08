@@ -21,7 +21,7 @@ public class AuthResultPacketD extends FoxhuntPacket
 		return message;
 	}
 
-	public boolean isResult()
+	public boolean getResult()
 	{
 		return result;
 	}

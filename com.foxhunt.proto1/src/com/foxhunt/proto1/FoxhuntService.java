@@ -19,7 +19,7 @@ import android.util.Log;
 public class FoxhuntService extends Service {
     private static final String TAG = FoxhuntService.class.getSimpleName();
     private FoxhuntClientApplication application;
-    private FoxhuntTCPClient client;
+    private FoxhuntClient client;
     private static final int STATUS = 1;
 
     public IBinder onBind(Intent intent) {
@@ -28,17 +28,19 @@ public class FoxhuntService extends Service {
 
     public void goOnline()
     {
-        client = new FoxhuntTCPClient(application.getHost(),application.getPort(), application.getUsername(), application.getPassword());
-        client.start();
-        UpdateNotification(STATUS, "Online", "Online", R.drawable.fox_blue32);
+        try
+        {
+        client.Connect();
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
     public void goOffline()
     {
-        client.interrupt();
-        client = null;
-
-        UpdateNotification(STATUS, "Offline", "Offline", R.drawable.fox_gray32);
+        client.Disconnect();
     }
     
     private void UpdateNotification(int notificationId, String tickerText, String statusText, int icon)
@@ -61,13 +63,30 @@ public class FoxhuntService extends Service {
         super.onCreate();    //To change body of overridden methods use File | Settings | File Templates.
         application = (FoxhuntClientApplication) getApplication();
         application.setFoxhuntService(this);
-        UpdateNotification(STATUS, "Offline","Offline", R.drawable.fox_gray32);
+        UpdateNotification(STATUS, "Offline", "Offline", R.drawable.fox_red32);
+        client = new FoxhuntClient(application.getUsername(),application.getPassword(), application.getHost(), application.getPort());
+        client.registerStateChangedListener(new FoxhuntClient.ClientStateChangeListener() {
+            @Override
+            public void OnStateChanged(FoxhuntClient client, FoxhuntClient.ClientState oldState, FoxhuntClient.ClientState newState, String message) {
+                switch (newState)
+                {
+                    case Online:
+                        UpdateNotification(STATUS, message !=null ? message : "Online", "Online", R.drawable.fox_blue32);
+                        break;
+                    case Offline:
+                        UpdateNotification(STATUS, message !=null ? message : "Offline", "Offline", R.drawable.fox_red32);
+                        break;
+                    case Connecting:
+                        UpdateNotification(STATUS, message !=null ? message : "Connecting", "Connecting", R.drawable.fox_gray32);
+                        break;
+                }
+            }
+        });
         Log.i(TAG, "onCreate");
     }
 
     @Override
     public void onDestroy() {
-        goOffline();
         super.onDestroy();    //To change body of overridden methods use File | Settings | File Templates.
         application.setFoxhuntService(null);
         Log.i(TAG,"onDestroy");
