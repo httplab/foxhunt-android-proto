@@ -123,14 +123,31 @@ public class FoxhuntMap extends View
 		canvas.drawPaint(backgr);
 
 
-
-		Bitmap icon = BitmapFactory.decodeResource(this.getResources(),R.drawable.fox_red16);
+        
+		 
+        
+        
+        Bitmap redIcon = BitmapFactory.decodeResource(this.getResources(),R.drawable.fox_red16);
+        Bitmap blueIcon = BitmapFactory.decodeResource(this.getResources(),R.drawable.fox_blue16);
+        Bitmap grayIcon = BitmapFactory.decodeResource(this.getResources(),R.drawable.fox_gray16);
 		
 		if(foxes !=null)
 		{
 			for(Fox fox : foxes)
 			{
-				DrawFox(fox,canvas,icon);
+                switch(fox.getType())
+                {
+                    case Fox.RED_FOX:
+                        DrawFox(fox,canvas,redIcon);
+                        break;
+                    case Fox.BLUE_FOX:
+                        DrawFox(fox,canvas,blueIcon);
+                        break;
+                    case Fox.GRAY_FOX:
+                        DrawFox(fox,canvas,grayIcon);
+                        break;
+                }
+
 			}
 		}
 
@@ -140,7 +157,7 @@ public class FoxhuntMap extends View
 			p.setARGB(255,230,230,230);
 
 			double x = projection.getXCoord(playerPosition)-centerX+width/2;
-			double y = projection.getYCoord(playerPosition)-centerY+height/2;
+			double y = -projection.getYCoord(playerPosition)+centerY+height/2;
 
 			canvas.drawCircle((float)x, (float)y, 3, p);
 			Paint radius = new Paint();
@@ -169,7 +186,7 @@ public class FoxhuntMap extends View
 		p.setColor(Color.WHITE);
 		
 		double x = projection.getXCoord(f.getLocation()) -centerX + width/2;
-		double y = projection.getYCoord(f.getLocation()) - centerY + height/2;
+		double y = -projection.getYCoord(f.getLocation()) + centerY + height/2;
 		canvas.drawBitmap(icon,(float)x-8,(float)y-15,p);
 		canvas.drawText(f.getName(),(float)x+22-16,(float) y-5,p);
 	}
@@ -196,7 +213,7 @@ public class FoxhuntMap extends View
 				float scrolledY = event.getY() - touchStartY;
 
 				centerX -=scrolledX;
-				centerY -=scrolledY;
+				centerY +=scrolledY;
 
 				touchStartX = event.getX();
 				touchStartY = event.getY();

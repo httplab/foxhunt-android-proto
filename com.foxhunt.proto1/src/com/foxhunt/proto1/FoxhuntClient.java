@@ -152,7 +152,7 @@ public class FoxhuntClient extends SimpleChannelUpstreamHandler
         bootstrap = new ClientBootstrap (factory);
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             public ChannelPipeline getPipeline() {
-                LengthFieldBasedFrameDecoder frameDecoder = new LengthFieldBasedFrameDecoder(1024,0,4,0,4);
+                LengthFieldBasedFrameDecoder frameDecoder = new LengthFieldBasedFrameDecoder(30*1024,0,4,0,4);
                 LengthFieldPrepender prepender = new LengthFieldPrepender(4,false);
                 return Channels.pipeline(prepender, new FoxhuntPackageEncoder(), frameDecoder, new FoxhuntPackageDecoder(),FoxhuntClient.this);
             }
@@ -182,6 +182,18 @@ public class FoxhuntClient extends SimpleChannelUpstreamHandler
         });
 
         
+    }
+
+
+    @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+
+    }
+
+    @Override
+    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        bootstrap.releaseExternalResources();
+        setClientState(ClientState.Offline);
     }
 
     public void Disconnect()

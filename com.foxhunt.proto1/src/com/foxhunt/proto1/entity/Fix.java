@@ -145,6 +145,6 @@ public class Fix
 
 	@Override public String toString()
 	{
-		return String.format("%1d; %2d; %3d", getLongitude(), getLatitude(), getClientTime());
+        return String.format("%1f; %2f; %3d", getLongitude(), getLatitude(), getClientTime());
 	}
 }

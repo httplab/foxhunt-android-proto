@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -70,6 +71,7 @@ public class MainActivity extends Activity
 
     public void RefreshView()
     {
+        Log.i("MAIN","RefreshView");
         FoxhuntService foxhuntService = ((FoxhuntClientApplication) getApplication()).getFoxhuntService();
         if(foxhuntService==null)
         {

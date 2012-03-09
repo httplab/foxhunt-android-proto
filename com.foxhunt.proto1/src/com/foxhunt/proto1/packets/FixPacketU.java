@@ -39,7 +39,9 @@ public class FixPacketU extends FoxhuntPacket
 		fix.setLatitude(stream.readDouble());
 		fix.setAccuracy(stream.readDouble());
 		fix.setClientTime(stream.readLong());
-
+        fix.setProviderId(stream.readByte());
+        
+        
 		int c =stream.read();
 
 		while (c!=-1)
@@ -59,6 +61,7 @@ public class FixPacketU extends FoxhuntPacket
 					fix.setFixTime(stream.readLong());
 					break;
 			}
+            c=stream.read();
 		}
 	}
 
@@ -68,28 +71,29 @@ public class FixPacketU extends FoxhuntPacket
 		stream.writeDouble(fix.getLatitude());
 		stream.writeDouble(fix.getAccuracy());
 		stream.writeLong(fix.getClientTime());
-		stream.write(fix.getProviderId());
-		if(fix.getAltitude()!=null)
+		stream.writeByte(fix.getProviderId());
+
+        if(fix.getAltitude()!=null)
 		{
-			stream.write(0x00);
+			stream.writeByte(0x00);
 			stream.writeDouble(fix.getAltitude().doubleValue());
 		}
 
 		if(fix.getSpeed()!=null)
 		{
-			stream.write(0x01);
+			stream.writeByte(0x01);
 			stream.writeDouble(fix.getSpeed().doubleValue());
 		}
 
 		if(fix.getBearing()!=null)
 		{
-			stream.write(0x02);
+			stream.writeByte(0x02);
 			stream.writeDouble(fix.getBearing().doubleValue());
 		}
 
 		if(fix.getFixTime()!=null)
 		{
-			stream.write(0x01);
+			stream.writeByte(0x03);
 			stream.writeLong(fix.getFixTime().longValue());
 		}
 	}

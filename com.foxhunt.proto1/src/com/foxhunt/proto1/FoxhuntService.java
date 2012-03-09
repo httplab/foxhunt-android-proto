@@ -1,21 +1,19 @@
 package com.foxhunt.proto1;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
+import android.app.*;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import com.foxhunt.proto1.entity.*;
-import com.foxhunt.proto1.packets.EnvironmentUpdatePacketD;
-import com.foxhunt.proto1.packets.FixPacketU;
-import com.foxhunt.proto1.packets.FoxhuntPacket;
-import com.foxhunt.proto1.packets.SystemMessagePacketD;
+import com.foxhunt.proto1.packets.*;
+import org.jboss.netty.util.ThreadRenamingRunnable;
 
 import java.util.Date;
 
@@ -34,6 +32,7 @@ public class FoxhuntService extends Service {
     private LocationListener locationListener = null;
     private long lastFixTime = 0;
     private Fox[] knownFoxes;
+    private Thread serviceThread;
 
     public Fox[] getKnownFoxes() {
         return knownFoxes;
@@ -81,14 +80,16 @@ public class FoxhuntService extends Service {
 
     public void BeginLocationListen()
     {
+        Log.i(TAG,"BeginLocationListen");
         LocationManager locationManager = (LocationManager )this.getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new FoxhuntLocationListener(this);
+
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener );
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
 
     public void EndLocationListen()
     {
+        Log.i(TAG,"EndLocationListen");
         LocationManager locationManager = (LocationManager )this.getSystemService(Context.LOCATION_SERVICE);
         locationManager.removeUpdates(locationListener);
     }
@@ -114,6 +115,7 @@ public class FoxhuntService extends Service {
 
     public void SendLocation()
     {
+        Log.i(TAG,"SendLocation");
         long now = new Date().getTime();
         if(now-lastFixTime<1000)
         {
@@ -148,10 +150,18 @@ public class FoxhuntService extends Service {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void onCreate() {
+        
         super.onCreate();    //To change body of overridden methods use File | Settings | File Templates.
         application = (FoxhuntClientApplication) getApplication();
+        locationListener = new FoxhuntLocationListener(this);
         application.setFoxhuntService(this);
+        final Handler mHandler = new Handler();
         UpdateNotification(STATUS, "Offline", "Offline", R.drawable.fox_red32);
         client = new FoxhuntClient(application.getUsername(),application.getPassword(), application.getHost(), application.getPort());
         client.registerStateChangedListener(new FoxhuntClient.ClientStateChangeListener() {
@@ -161,11 +171,23 @@ public class FoxhuntService extends Service {
                 {
                     case Online:
                         UpdateNotification(STATUS, message !=null ? message : "Online", "Online", R.drawable.fox_blue32);
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {                  
+                                BeginLocationListen();
+                            }
+                        });
                         BeginLocationListen();
+                        client.SendPacket(new EnvironmentUpdateRequestPacketU());
                         break;
                     case Offline:
                         UpdateNotification(STATUS, message !=null ? message : "Offline", "Offline", R.drawable.fox_red32);
-                        EndLocationListen();
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                EndLocationListen();
+                            }
+                        });
                         break;
                     case Connecting:
                         UpdateNotification(STATUS, message !=null ? message : "Connecting", "Connecting", R.drawable.fox_gray32);
@@ -178,6 +200,7 @@ public class FoxhuntService extends Service {
         client.registerIncomingPacketListener(new FoxhuntClient.IncomingPacketListener() {
             @Override
             public void OnIncomingPacket(FoxhuntPacket packet) {
+                Log.i(TAG, "PacketReceived");
                 if(packet instanceof SystemMessagePacketD)
                 {
                     SystemMessagePacketD p = (SystemMessagePacketD) packet;
@@ -187,11 +210,18 @@ public class FoxhuntService extends Service {
                 {
                     EnvironmentUpdatePacketD p = (EnvironmentUpdatePacketD) packet;
                     knownFoxes = p.getFoxes();
-                    if(application.getMainActivity()!=null)
-                    {
-                        application.getMainActivity().RefreshView();
-                    }
-                    ShowSystemMessage("Foxes Arrived");
+                    Log.i(TAG, "EnvironmentUpdate");
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(application.getMainActivity()!=null)
+                            {
+
+                                application.getMainActivity().RefreshView();
+                            }
+                        }
+                    }       );
+
                 }
             }
         });
@@ -212,6 +242,7 @@ public class FoxhuntService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);    //To change body of overridden methods use File | Settings | File Templates.
+        return START_STICKY;
+
     }
 }
