@@ -19,6 +19,7 @@ public abstract class FoxhuntPacket
 	public static final int ENVIRONMENT_UPDATE_REQUEST_U = 0x00000005;
 	public static final int USER_INPUT_U = 0x00000006;
 	public static final int SYSTEM_MESSAGE_D = 0x00000007;
+    public static final int GAME_EVENT_PACKET_D = 0x00000008;
 	
 	public byte[] Serialize() throws IOException
 	{
@@ -80,6 +81,9 @@ public abstract class FoxhuntPacket
 			case SYSTEM_MESSAGE_D:
 				res = new SystemMessagePacketD(dis);
 				break;
+            case GAME_EVENT_PACKET_D:
+                res = new GameEventPacketD(dis);
+                break;
 			default:
 				res = null;
 		}

@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 import com.foxhunt.proto1.entity.*;
 import com.foxhunt.proto1.packets.*;
 import org.jboss.netty.util.ThreadRenamingRunnable;
@@ -222,6 +223,20 @@ public class FoxhuntService extends Service {
                         }
                     }       );
 
+                }
+                else if(packet instanceof GameEventPacketD)
+                {
+                    final String msg = ((GameEventPacketD) packet).getMessage();
+                    if(application.getMainActivity()!=null)
+                    {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(application.getMainActivity(),msg, Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                    }
                 }
             }
         });
