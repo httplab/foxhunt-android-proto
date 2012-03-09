@@ -5,17 +5,27 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.foxhunt.proto1.entity.Fox;
+import com.google.android.maps.*;
 
 import java.util.*;
 
-public class MainActivity extends Activity
+public class MainActivity extends MapActivity
 {
+    protected MapView mapView;
+    protected MapController mapController;
+    Drawable drawable;
+    RadarItemizedOverlay itemizedOverlay;
+    
+    private Boolean isManuallyScrolled = false;
+
 	@Override public void onConfigurationChanged(Configuration newConfig)
 	{
 		super.onConfigurationChanged(newConfig);
@@ -34,20 +44,26 @@ public class MainActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-    }
-	
-	public void btnZoomIn_click(View v)
-	{
-		FoxhuntMap fxmMap= (FoxhuntMap)findViewById(R.id.fxmMap);
-		fxmMap.setScale(fxmMap.getScale() / 1.3);
-	}
+        setContentView(R.layout.radar);
 
-	public void btnZoomOut_click(View v)
-	{
-		FoxhuntMap fxmMap= (FoxhuntMap)findViewById(R.id.fxmMap);
-		fxmMap.setScale(fxmMap.getScale() * 1.3);
-	}
+        drawable = this.getResources().getDrawable(R.drawable.fox_red16);
+        itemizedOverlay = new RadarItemizedOverlay(drawable, this);
+
+        mapView = (MapView) findViewById(R.id.mapview);
+        mapView.setBuiltInZoomControls(true);
+        mapController = mapView.getController();
+        
+        mapView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(MotionEvent.ACTION_MOVE == motionEvent.getAction()) {
+                    isManuallyScrolled = true;
+                }
+
+                return false;
+            }
+        } );
+    }
 
     @Override
     protected void onResume() {
@@ -63,11 +79,32 @@ public class MainActivity extends Activity
     }
 
     @Override
+    protected boolean isRouteDisplayed() {
+        return false;
+    }
+
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
+
+    private void centerOnPlayer() {
+        FoxhuntService foxhuntService = ((FoxhuntClientApplication) getApplication()).getFoxhuntService();
+        if(foxhuntService==null) {
+            return;
+        }
+
+        if(foxhuntService.getLastKnownLocation()==null) {
+            return;
+        }
+
+        Location location = foxhuntService.getLastKnownLocation();
+        if (!isManuallyScrolled) {
+            mapController.setCenter(new GeoPoint((int) (location.getLatitude() * 1e6), (int) (location.getLongitude() * 1e6)));
+        }
+    }
 
     public void RefreshView()
     {
@@ -77,22 +114,27 @@ public class MainActivity extends Activity
         {
             return;
         }
-
-        if(foxhuntService.getLastKnownLocation()==null)
-        {
-            return;
-        }
-
-        FoxhuntMap fxmMap= (FoxhuntMap)findViewById(R.id.fxmMap);
-        fxmMap.setPlayerPosition(foxhuntService.getLastKnownLocation());
         
-        if(foxhuntService.getKnownFoxes()==null)
+        Fox[] foxes = foxhuntService.getKnownFoxes();
+        
+        if(foxes == null)
         {
-            fxmMap.setFoxes(new ArrayList<Fox>());
             return;
         }
 
-        fxmMap.setFoxes(new ArrayList<Fox>(Arrays.asList(foxhuntService.getKnownFoxes())));
+        List<Overlay> mapOverlays = mapView.getOverlays();
+        itemizedOverlay.clearOverlay();
+        mapOverlays.clear();
+
+        for (int i = 0; i < foxes.length; i++) {
+            GeoPoint point = new GeoPoint((int) (foxes[i].getLatitude() * 1e6), (int) (foxes[i].getLongitude() * 1e6));
+            OverlayItem overlayItem = new OverlayItem(point, foxes[i].getName(), "");
+            itemizedOverlay.addOverlay(overlayItem);
+        }
+
+        mapOverlays.add(itemizedOverlay);
+
+        centerOnPlayer();
     }
 
 
@@ -136,8 +178,10 @@ public class MainActivity extends Activity
 			case R.id.miLoginInfo:
 				return true;
 			case R.id.miMyLocation:
-				FoxhuntMap map = (FoxhuntMap)findViewById(R.id.fxmMap);
-				map.setCenterOnPlayer(true);
+				//FoxhuntMap map = (FoxhuntMap)findViewById(R.id.fxmMap);
+				//map.setCenterOnPlayer(true);
+                isManuallyScrolled = false;
+                centerOnPlayer();
                 return true;
             case R.id.miGoOnline:
                 application.getFoxhuntService().goOnline();
