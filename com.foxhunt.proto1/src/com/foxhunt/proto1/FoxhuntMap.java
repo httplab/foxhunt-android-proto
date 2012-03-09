@@ -3,10 +3,10 @@ package com.foxhunt.proto1;
 import android.content.Context;
 import android.graphics.*;
 import android.location.Location;
-import android.location.LocationManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import com.foxhunt.proto1.entity.Fox;
 
 import java.util.ArrayList;
 

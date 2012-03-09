@@ -4,4 +4,13 @@
     <string name="title">Foxhunt Prototype</string>
     <string name="waiting">Waiting for position</string>
     <string name="pos_ready">Position is available</string>
+    <string-array name="projectionNames">
+        <item>Mercator</item>
+        <item>Yandex Mercator</item>
+    </string-array>
+
+    <string-array name="projectionIds">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 </resources>

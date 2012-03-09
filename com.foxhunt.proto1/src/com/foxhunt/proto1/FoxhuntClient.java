@@ -61,18 +61,6 @@ public class FoxhuntClient extends SimpleChannelUpstreamHandler
         this.host = host;
         this.password = password;
         this.port = port;
-
-        ChannelFactory factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-        bootstrap = new ClientBootstrap (factory);
-        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-            public ChannelPipeline getPipeline() {
-                LengthFieldBasedFrameDecoder frameDecoder = new LengthFieldBasedFrameDecoder(1024,0,4,0,4);
-                LengthFieldPrepender prepender = new LengthFieldPrepender(4,false);
-                return Channels.pipeline(prepender, new FoxhuntPackageEncoder(), frameDecoder, new FoxhuntPackageDecoder(),FoxhuntClient.this);
-            }
-        });
-        bootstrap.setOption("tcpNoDelay" , true);
-        bootstrap.setOption("keepAlive", true);
     }
 
 
@@ -147,7 +135,10 @@ public class FoxhuntClient extends SimpleChannelUpstreamHandler
 
     public void SendPacket(FoxhuntPacket packet)
     {
-        lastWriteFuture = channel.write(packet);
+        if(getClientState()==ClientState.Online)
+        {
+            lastWriteFuture = channel.write(packet);
+        }
     }
 
     public void Connect() throws Exception
@@ -157,23 +148,40 @@ public class FoxhuntClient extends SimpleChannelUpstreamHandler
             return;
         }
 
+        ChannelFactory factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
+        bootstrap = new ClientBootstrap (factory);
+        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+            public ChannelPipeline getPipeline() {
+                LengthFieldBasedFrameDecoder frameDecoder = new LengthFieldBasedFrameDecoder(1024,0,4,0,4);
+                LengthFieldPrepender prepender = new LengthFieldPrepender(4,false);
+                return Channels.pipeline(prepender, new FoxhuntPackageEncoder(), frameDecoder, new FoxhuntPackageDecoder(),FoxhuntClient.this);
+            }
+        });
+        bootstrap.setOption("tcpNoDelay" , true);
+        bootstrap.setOption("keepAlive", true);
+
         ChannelFuture lastWriteFuture=null;
         setClientState(ClientState.Connecting);
         InetSocketAddress addr = new InetSocketAddress(getHost(), getPort());
-        ChannelFuture connectWait = bootstrap.connect(addr);
-        connectWait.awaitUninterruptibly();
+        final ChannelFuture connectWait = bootstrap.connect(addr);
+        connectWait.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if(!connectWait.isSuccess())
+                {
+                    connectWait.getCause();
+                    bootstrap.releaseExternalResources();
+                    setClientState(ClientState.Offline, connectWait.getCause().getMessage());
+                    return;
+                }
 
-        if(!connectWait.isSuccess())
-        {
-            connectWait.getCause();
-            bootstrap.releaseExternalResources();
-            setClientState(ClientState.Offline, connectWait.getCause().getMessage());
-            return;
-        }
+                channel = connectWait.getChannel();
 
-        channel = connectWait.getChannel();
+                FoxhuntClient.this.lastWriteFuture = channel.write(new ConnectionRequestPacketU(getUsername(), getPassword(),"DUMMY","DUMMY"));
+            }
+        });
 
-        lastWriteFuture = channel.write(new ConnectionRequestPacketU(getUsername(), getPassword(),"DUMMY","DUMMY"));
+        
     }
 
     public void Disconnect()

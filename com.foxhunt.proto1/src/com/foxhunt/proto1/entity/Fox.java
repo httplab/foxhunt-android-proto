@@ -1,5 +1,8 @@
 package com.foxhunt.proto1.entity;
 
+import android.location.Location;
+import android.location.LocationManager;
+
 import java.io.*;
 
 /**
@@ -40,6 +43,15 @@ public class Fox
 	{
 		this.latitude = latitude;
 	}
+
+    public Location getLocation()
+    {
+        Location res =  new Location(LocationManager.PASSIVE_PROVIDER);
+        res.setLatitude(getLatitude());
+        res.setLongitude(getLongitude());
+        return res;
+    }
+
 
 	public double getLongitude()
 	{

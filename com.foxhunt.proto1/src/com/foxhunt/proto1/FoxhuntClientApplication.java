@@ -15,6 +15,9 @@ import android.util.Log;
 public class FoxhuntClientApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = FoxhuntClientApplication.class.getSimpleName();
     private SharedPreferences preferences;
+    private FoxhuntService service;
+    private MainActivity mainActivity;
+
 
     public FoxhuntService getFoxhuntService() {
         return service;
@@ -24,11 +27,17 @@ public class FoxhuntClientApplication extends Application implements SharedPrefe
         this.service = service;
     }
 
-    private FoxhuntService service;
+    public MainActivity getMainActivity() {
+        return mainActivity;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        getFoxhuntService().OnPreferencesChange();
     }
 
     @Override

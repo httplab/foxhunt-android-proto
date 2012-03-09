@@ -21,7 +21,8 @@
             android:layout_weight="0.6"
             android:layout_width="fill_parent"
             android:background="#0000ee"
-            android:id="@+id/fxmMap"/>
+            android:id="@+id/fxmMap"
+            android:keepScreenOn="true"/>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"

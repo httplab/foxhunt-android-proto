@@ -1,5 +1,9 @@
 package com.foxhunt.proto1.entity;
 
+import android.location.Location;
+
+import java.util.Date;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nu-hin
@@ -21,6 +25,24 @@ public class Fix
 	private Double speed;
 	private Long fixTime;
 
+    public Fix()
+    {
+        
+    }
+    
+    public Fix(Location location)
+    {
+        this.accuracy = location.getAccuracy();
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+        this.providerId = location.getProvider() == "gps" ? (byte)0 : (byte)1;
+        this.clientTime = new Date().getTime();
+        this.altitude = location.hasAltitude() ? location.getAltitude() : null;
+        this.bearing = location.hasBearing() ? (double) location.getBearing() : null;
+        this.fixTime = location.getTime();
+    }
+    
+    
 	public Integer getPlayerId()
 	{
 		return playerId;

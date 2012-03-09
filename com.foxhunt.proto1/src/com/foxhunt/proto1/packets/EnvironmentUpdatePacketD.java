@@ -33,6 +33,11 @@ public class EnvironmentUpdatePacketD extends FoxhuntPacket
 		}
 	}
 
+    public Fox[] getFoxes()
+    {
+        return foxes;
+    }
+    
 	public EnvironmentUpdatePacketD(DataInputStream stream) throws IOException
 	{
 		serverTime = stream.readLong();

@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <PreferenceCategory android:title="Authentication">
         <EditTextPreference android:title="Username"
                              android:key="username"></EditTextPreference>
         <EditTextPreference android:title="Password"
                             android:password="true"
                             android:key="password"></EditTextPreference>
-
-
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Connection">
         <EditTextPreference android:title="Host" android:key="host"/>
         <EditTextPreference android:title="Port" android:key="port"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Other preferences">
+        <ListPreference android:title="Projection type"
+                        android:summary="Projection used for map drawing"
+                        android:key="projection"
+                        android:entries="@array/projectionNames"
+                        android:entryValues="@array/projectionIds"
+                />
+        <CheckBoxPreference android:title="Show fox labels" android:key="showLabels"/>
+            
+        
+
+    </PreferenceCategory>
 </PreferenceScreen>
