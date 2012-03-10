@@ -22,7 +22,9 @@ public class MainActivity extends MapActivity
     protected MapView mapView;
     protected MapController mapController;
     Drawable drawable;
+    Drawable player;
     RadarItemizedOverlay itemizedOverlay;
+    RadarItemizedOverlay playerOverlay;
     
     private Boolean isManuallyScrolled = false;
 
@@ -47,7 +49,9 @@ public class MainActivity extends MapActivity
         setContentView(R.layout.radar);
 
         drawable = this.getResources().getDrawable(R.drawable.fox_red16);
+        player = this.getResources().getDrawable(R.drawable.player);
         itemizedOverlay = new RadarItemizedOverlay(drawable, this);
+        playerOverlay = new RadarItemizedOverlay(player, this);
 
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
@@ -106,6 +110,16 @@ public class MainActivity extends MapActivity
         }
     }
 
+    private void drawPlayer(double latitude, double longitude) {
+        GeoPoint point = new GeoPoint((int) (latitude * 1e6), (int) (longitude * 1e6));
+        OverlayItem overlayItem = new OverlayItem(point, "", "");
+        playerOverlay.clearOverlay();
+        playerOverlay.addOverlay(overlayItem);
+
+        List<Overlay> mapOverlays = mapView.getOverlays();
+        mapOverlays.add(playerOverlay);
+    }
+
     public void RefreshView()
     {
         Log.i("MAIN","RefreshView");
@@ -133,6 +147,11 @@ public class MainActivity extends MapActivity
         }
 
         mapOverlays.add(itemizedOverlay);
+
+
+        Location location = foxhuntService.getLastKnownLocation();
+        if (location == null) { return; };
+        drawPlayer(location.getLatitude(), location.getLongitude());
 
         centerOnPlayer();
     }
