@@ -21,12 +21,24 @@ public class MainActivity extends MapActivity
 {
     protected MapView mapView;
     protected MapController mapController;
-    Drawable drawable;
-    Drawable player;
-    RadarItemizedOverlay itemizedOverlay;
-    RadarItemizedOverlay playerOverlay;
-    
+    private Drawable drawable;
+    private Drawable player;
+    private RadarItemizedOverlay itemizedOverlay;
+    private RadarItemizedOverlay playerOverlay;
     private Boolean isManuallyScrolled = false;
+    
+    private class TouchOverlay extends Overlay{
+        @Override
+        public boolean onTouchEvent(MotionEvent motionEvent, MapView mapView) {
+            if(motionEvent.getAction() == MotionEvent.ACTION_MOVE)
+            {
+                MainActivity.this.isManuallyScrolled = true;
+            }
+            return false;
+        }
+    }
+    
+
 
 	@Override public void onConfigurationChanged(Configuration newConfig)
 	{
@@ -56,7 +68,7 @@ public class MainActivity extends MapActivity
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         mapController = mapView.getController();
-
+        mapView.getOverlays().add(new TouchOverlay());
     }
 
     @Override
@@ -142,6 +154,7 @@ public class MainActivity extends MapActivity
         drawPlayer(location.getLatitude(), location.getLongitude());
         
         mapOverlays.add(itemizedOverlay);
+        mapOverlays.add(new TouchOverlay());
         mapView.invalidate();
     }
 
