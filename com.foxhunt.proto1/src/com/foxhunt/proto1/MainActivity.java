@@ -156,6 +156,7 @@ public class MainActivity extends MapActivity
         mapOverlays.add(itemizedOverlay);
         mapOverlays.add(new TouchOverlay());
         mapView.invalidate();
+        centerOnPlayer();
     }
 
 
