@@ -3,4 +3,5 @@ out
 *.iml
 *.ipr
 .DS_Store
+local.xml
 Thumbs.db

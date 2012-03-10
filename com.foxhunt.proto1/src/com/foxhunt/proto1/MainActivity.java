@@ -56,17 +56,7 @@ public class MainActivity extends MapActivity
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         mapController = mapView.getController();
-        
-        mapView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(MotionEvent.ACTION_MOVE == motionEvent.getAction()) {
-                    isManuallyScrolled = true;
-                }
 
-                return false;
-            }
-        } );
     }
 
     @Override
@@ -146,14 +136,13 @@ public class MainActivity extends MapActivity
             itemizedOverlay.addOverlay(overlayItem);
         }
 
-        mapOverlays.add(itemizedOverlay);
-
 
         Location location = foxhuntService.getLastKnownLocation();
         if (location == null) { return; };
         drawPlayer(location.getLatitude(), location.getLongitude());
-
-        centerOnPlayer();
+        
+        mapOverlays.add(itemizedOverlay);
+        mapView.invalidate();
     }
 
 
