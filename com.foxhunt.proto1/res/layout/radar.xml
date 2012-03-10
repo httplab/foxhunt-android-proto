@@ -7,5 +7,5 @@
                                  android:layout_width="fill_parent"
                                  android:layout_height="fill_parent"
                                  android:clickable="true"
-                                 android:apiKey="0UMGzYR1NR9i1FiRhYw-jjyJWwi5pzjNqT0fhtA"/>
+                                 android:apiKey="@string/googleApiKey"/>
 </LinearLayout>

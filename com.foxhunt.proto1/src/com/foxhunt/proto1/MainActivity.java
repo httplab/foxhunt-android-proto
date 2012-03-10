@@ -52,17 +52,7 @@ public class MainActivity extends MapActivity
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         mapController = mapView.getController();
-        
-        mapView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(MotionEvent.ACTION_MOVE == motionEvent.getAction()) {
-                    isManuallyScrolled = true;
-                }
 
-                return false;
-            }
-        } );
     }
 
     @Override
@@ -133,8 +123,7 @@ public class MainActivity extends MapActivity
         }
 
         mapOverlays.add(itemizedOverlay);
-
-        centerOnPlayer();
+        mapView.invalidate();
     }
 
 

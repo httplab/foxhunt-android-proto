@@ -47,28 +47,32 @@ public final class R {
     public static final class id {
         public static final int fxmMap=0x7f080001;
         public static final int llFoxes=0x7f080003;
-        public static final int miExit=0x7f080005;
-        public static final int miGoOffline=0x7f08000b;
-        public static final int miGoOnline=0x7f08000a;
-        public static final int miLoginInfo=0x7f080006;
-        public static final int miMap=0x7f080007;
-        public static final int miMyLocation=0x7f080009;
-        public static final int miSettings=0x7f080008;
+        public static final int mapview=0x7f080005;
+        public static final int miExit=0x7f080006;
+        public static final int miGoOffline=0x7f08000c;
+        public static final int miGoOnline=0x7f08000b;
+        public static final int miLoginInfo=0x7f080007;
+        public static final int miMap=0x7f080008;
+        public static final int miMyLocation=0x7f08000a;
+        public static final int miSettings=0x7f080009;
         public static final int scvObjects=0x7f080002;
         public static final int txtCoords=0x7f080000;
         public static final int txtStatus=0x7f080004;
     }
     public static final class layout {
         public static final int main=0x7f030000;
+        public static final int radar=0x7f030001;
     }
     public static final class menu {
         public static final int main_menu=0x7f070000;
     }
     public static final class string {
-        public static final int app_name=0x7f050000;
-        public static final int pos_ready=0x7f050003;
-        public static final int title=0x7f050001;
-        public static final int waiting=0x7f050002;
+        public static final int app_name=0x7f050002;
+        public static final int googleApiKey=0x7f050000;
+        public static final int googleApiKeyOld=0x7f050001;
+        public static final int pos_ready=0x7f050005;
+        public static final int title=0x7f050003;
+        public static final int waiting=0x7f050004;
     }
     public static final class xml {
         public static final int prefs=0x7f040000;
