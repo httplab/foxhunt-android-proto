@@ -5,3 +5,5 @@ out
 .DS_Store
 local.xml
 Thumbs.db
+*/gen
+strings.xml
