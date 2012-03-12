@@ -2,6 +2,7 @@ package com.foxhunt.proto1.entity;
 
 import android.location.Location;
 import android.location.LocationManager;
+import com.google.android.maps.GeoPoint;
 
 import java.io.*;
 
@@ -108,4 +109,9 @@ public class Fox
 
 		return res;
 	}
+
+    public GeoPoint getGeoPoint()
+    {
+        return new GeoPoint((int) (latitude*1e6),  (int) (longitude * 1e6));
+    }
 }

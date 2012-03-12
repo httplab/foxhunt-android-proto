@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -13,7 +16,9 @@ import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.foxhunt.proto1.entity.Fox;
+import com.foxhunt.proto1.entity.Spot;
 import com.google.android.maps.*;
+import com.google.android.maps.Projection;
 
 import java.util.*;
 
@@ -23,6 +28,7 @@ public class MainActivity extends MapActivity
     protected MapController mapController;
     private Drawable drawable;
     private Drawable player;
+    private Drawable otherPlayer;
     private RadarItemizedOverlay itemizedOverlay;
     private RadarItemizedOverlay playerOverlay;
     private Boolean isManuallyScrolled = false;
@@ -37,8 +43,54 @@ public class MainActivity extends MapActivity
             return false;
         }
     }
-    
 
+    private class CircleOverlay extends Overlay{
+        private Spot mainPlayer;
+        private Spot[] otherPlayers;
+
+        public CircleOverlay(Spot mainPlayer, Spot[] otherPlayers)
+        {
+            this.mainPlayer = mainPlayer;
+            this.otherPlayers = otherPlayers;
+        }
+        
+        @Override
+        public void draw(Canvas canvas, MapView mapView, boolean b) {
+            super.draw(canvas, mapView, b);    //To change body of overridden methods use File | Settings | File Templates.
+            Projection projection = mapView.getProjection();
+
+            Point mainPlayerPoint =  projection.toPixels(mainPlayer.getGeoPoint(),null);
+            float mainPlayerRadius = projection.metersToEquatorPixels((float)mainPlayer.getRadius());
+            
+            
+            Paint innerPaint = new Paint();
+            Paint strokePaint = new Paint();
+
+            innerPaint.setARGB(30,0,0,255);
+            strokePaint.setARGB(255,0,0,255);
+            strokePaint.setAntiAlias(true);
+            strokePaint.setStrokeWidth(3);
+
+            innerPaint.setStyle(Paint.Style.FILL);
+            strokePaint.setStyle(Paint.Style.STROKE);
+            
+
+            canvas.drawCircle(mainPlayerPoint.x,mainPlayerPoint.y, mainPlayerRadius,innerPaint);
+            canvas.drawCircle(mainPlayerPoint.x,mainPlayerPoint.y, mainPlayerRadius,strokePaint);
+
+            innerPaint.setARGB(30,255,0,0);
+            strokePaint.setARGB(255,255,0,0);
+
+            for(int i=0; i<otherPlayers.length; i++)
+            {
+                Point p = projection.toPixels(otherPlayers[i].getGeoPoint(),null);
+                float r = projection.metersToEquatorPixels((float) otherPlayers[i].getRadius());
+                canvas.drawCircle(p.x,p.y, r,innerPaint);
+                canvas.drawCircle(p.x,p.y, r,strokePaint);
+            }
+
+        }
+    }
 
 	@Override public void onConfigurationChanged(Configuration newConfig)
 	{
@@ -61,7 +113,8 @@ public class MainActivity extends MapActivity
         setContentView(R.layout.radar);
 
         drawable = this.getResources().getDrawable(R.drawable.fox_red16);
-        player = this.getResources().getDrawable(R.drawable.player);
+        player = this.getResources().getDrawable(R.drawable.marker_blue);
+        otherPlayer = this.getResources().getDrawable(R.drawable.marker_red);
         itemizedOverlay = new RadarItemizedOverlay(drawable, this);
         playerOverlay = new RadarItemizedOverlay(player, this);
 
@@ -145,6 +198,7 @@ public class MainActivity extends MapActivity
         for (int i = 0; i < foxes.length; i++) {
             GeoPoint point = new GeoPoint((int) (foxes[i].getLatitude() * 1e6), (int) (foxes[i].getLongitude() * 1e6));
             OverlayItem overlayItem = new OverlayItem(point, foxes[i].getName(), "");
+
             itemizedOverlay.addOverlay(overlayItem);
         }
 
@@ -152,11 +206,19 @@ public class MainActivity extends MapActivity
         Location location = foxhuntService.getLastKnownLocation();
         if (location == null) { return; };
         drawPlayer(location.getLatitude(), location.getLongitude());
-        
+        CircleOverlay circleOverlay = new CircleOverlay(new Spot(0,location.getLatitude(), location.getLongitude(), 0, "",location.getAccuracy()), foxhuntService.getKnownSpots());
+            
+
         mapOverlays.add(itemizedOverlay);
+        mapOverlays.add(circleOverlay);
         mapOverlays.add(new TouchOverlay());
+        
+        if(!isManuallyScrolled)
+        {
+            centerOnPlayer();
+        }
         mapView.invalidate();
-        centerOnPlayer();
+        
     }
 
 

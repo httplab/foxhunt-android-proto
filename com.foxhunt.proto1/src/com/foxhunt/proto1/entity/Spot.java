@@ -1,5 +1,7 @@
 package com.foxhunt.proto1.entity;
 
+import com.google.android.maps.GeoPoint;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -26,7 +28,7 @@ public class Spot
 
     }
 
-    public Spot(int id, long latitude, long longitude, int type, String name, double radius)
+    public Spot(int id, double latitude, double longitude, int type, String name, double radius)
     {
         this.id = id;
         this.latitude = latitude;
@@ -122,4 +124,13 @@ public class Spot
         res.radius = stream.readDouble();
 
         return res;
-    }}
+    }
+
+    public GeoPoint getGeoPoint()
+    {
+        return new GeoPoint((int) (latitude*1e6),  (int) (longitude * 1e6));
+    }
+
+}
+
+

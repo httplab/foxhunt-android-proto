@@ -33,7 +33,12 @@ public class FoxhuntService extends Service {
     private LocationListener locationListener = null;
     private long lastFixTime = 0;
     private Fox[] knownFoxes;
+    private Spot[] knownSpots;
     private Thread serviceThread;
+
+    public Spot[] getKnownSpots() {
+        return knownSpots ==null  ? new Spot[0] : knownSpots;
+    }
 
     public Fox[] getKnownFoxes() {
         return knownFoxes;
@@ -211,6 +216,7 @@ public class FoxhuntService extends Service {
                 {
                     EnvironmentUpdatePacketD p = (EnvironmentUpdatePacketD) packet;
                     knownFoxes = p.getFoxes();
+                    knownSpots = p.getSpots();
                     Log.i(TAG, "EnvironmentUpdate");
                     mHandler.post(new Runnable() {
                         @Override
